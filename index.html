@@ -1,19 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texas Hold'em</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
 <body>
 
     <h1>Texas Hold'em</h1>
 
     <div id="table">
 
-        <div id="community-cards"></div>
+        <div id="top-seat"></div>
 
-        <div id="player-area"></div>
+        <div id="middle-row">
+
+            <div id="left-seat"></div>
+
+            <div id="board-area">
+
+                <div id="pot">
+                    Pot: $0
+                </div>
+
+                <div id="community-cards"></div>
+
+            </div>
+
+            <div id="right-seat"></div>
+
+        </div>
+
+        <div id="player-seat"></div>
 
     </div>
-
-    <h2>Log</h2>
 
     <div id="log"></div>
 
     <script type="module" src="js/main.js"></script>
 
 </body>
+</html>

@@ -2,35 +2,34 @@ import { PokerGame } from "./game.js";
 import { createCard } from "./ui.js";
 import { log } from "./logger.js";
 
-const game =
-    new PokerGame();
+log("main.js loaded");
+
+const game = new PokerGame();
+
+log("PokerGame created");
 
 game.startHand();
 
-log("New hand started.");
+log("Hand started");
 
-const seats = {
-
-    top:
-    document.getElementById(
-        "top-seat"
-    ),
-
-    left:
-    document.getElementById(
-        "left-seat"
-    ),
-
-    right:
-    document.getElementById(
-        "right-seat"
-    ),
-
-    player:
-    document.getElementById(
-        "player-seat"
-    )
+const seatElements = {
+    player: document.getElementById("player-seat"),
+    left: document.getElementById("left-seat"),
+    top: document.getElementById("top-seat"),
+    right: document.getElementById("right-seat")
 };
+
+for (const key in seatElements) {
+
+    if (!seatElements[key]) {
+
+        log(`Missing HTML element: ${key}`);
+        console.error(`Missing HTML element: ${key}`);
+        return;
+
+    }
+
+}
 
 const seatOrder = [
     "player",
@@ -39,32 +38,29 @@ const seatOrder = [
     "right"
 ];
 
-for (let i = 0; i < 4; i++) {
+for (let i = 0; i < game.players.length; i++) {
 
-    const player =
-        game.players[i];
+    const player = game.players[i];
 
-    const container =
-        seats[
+    const seat =
+        seatElements[
             seatOrder[i]
         ];
+
+    seat.innerHTML = "";
 
     const name =
         document.createElement("div");
 
-    name.className =
-        "player-name";
+    name.className = "player-name";
+    name.textContent = player.name;
 
-    name.textContent =
-        player.name;
-
-    container.appendChild(name);
+    seat.appendChild(name);
 
     const cards =
         document.createElement("div");
 
-    cards.className =
-        "cards";
+    cards.className = "cards";
 
     if (player.isBot) {
 
@@ -74,28 +70,54 @@ for (let i = 0; i < 4; i++) {
 
     } else {
 
-        player.hand.forEach(card => {
+        for (const card of player.hand) {
 
             cards.appendChild(
                 createCard(card)
             );
 
-        });
+        }
 
     }
 
-    container.appendChild(cards);
+    seat.appendChild(cards);
+
 }
 
 const board =
-document.getElementById(
-    "community-cards"
-);
-
-game.communityCards.forEach(card => {
-
-    board.appendChild(
-        createCard(card)
+    document.getElementById(
+        "community-cards"
     );
 
-});
+if (!board) {
+
+    log("community-cards element missing");
+    console.error("community-cards element missing");
+
+} else {
+
+    board.innerHTML = "";
+
+    for (const card of game.communityCards) {
+
+        board.appendChild(
+            createCard(card)
+        );
+
+    }
+
+}
+
+const pot =
+    document.getElementById(
+        "pot"
+    );
+
+if (pot) {
+
+    pot.textContent =
+        `Pot: $${game.pot}`;
+
+}
+
+log("Render complete");

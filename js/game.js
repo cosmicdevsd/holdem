@@ -1,53 +1,76 @@
-import { Deck } from "./deck.js";
-import { Player } from "./player.js";
-
-export class PokerGame {
+export class Deck {
 
     constructor() {
-
-        this.deck = new Deck();
-
-        this.players = [
-            new Player("You"),
-            new Player("Bot 1")
-        ];
-
-        this.communityCards = [];
-
+        this.cards = [];
     }
 
-    startHand() {
+    build() {
 
-        this.deck.build();
+        this.cards = [];
 
-        this.deck.shuffle();
+        const suits = [
+            "H",
+            "D",
+            "C",
+            "S"
+        ];
 
-        this.communityCards = [];
+        const ranks = [
+            "A",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "J",
+            "Q",
+            "K"
+        ];
 
-        for (const player of this.players) {
-            player.hand = [];
-        }
+        for (const suit of suits) {
 
-        for (let i = 0; i < 2; i++) {
+            for (const rank of ranks) {
 
-            for (const player of this.players) {
-
-                player.hand.push(
-                    this.deck.deal()
-                );
+                this.cards.push({
+                    rank,
+                    suit
+                });
 
             }
 
         }
 
-        for (let i = 0; i < 5; i++) {
+    }
 
-            this.communityCards.push(
-                this.deck.deal()
-            );
+    shuffle() {
+
+        for (let i = this.cards.length - 1; i > 0; i--) {
+
+            const random = new Uint32Array(1);
+
+            crypto.getRandomValues(random);
+
+            const j = random[0] % (i + 1);
+
+            [
+                this.cards[i],
+                this.cards[j]
+            ] =
+            [
+                this.cards[j],
+                this.cards[i]
+            ];
 
         }
 
+    }
+
+    deal() {
+        return this.cards.pop();
     }
 
 }

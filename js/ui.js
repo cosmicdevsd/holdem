@@ -14,44 +14,30 @@ function suitSymbol(suit) {
         case "S":
             return "♠";
 
+        default:
+            return "?";
     }
 
 }
 
-export function createCardElement(card) {
+export function createCard(card) {
 
-    const img = document.createElement("img");
+    const div =
+        document.createElement("div");
 
-    const file =
-        `assets/cards/${card.rank}${card.suit}.png`;
+    div.className = "card";
 
-    img.src = file;
+    const red =
+        card.suit === "H" ||
+        card.suit === "D";
 
-    img.width = 100;
-    img.height = 140;
+    div.classList.add(
+        red ? "red" : "black"
+    );
 
-    img.onerror = () => {
+    div.textContent =
+        card.rank +
+        suitSymbol(card.suit);
 
-        const fallback =
-            document.createElement("div");
-
-        fallback.classList.add("card");
-
-        const red =
-            card.suit === "H" ||
-            card.suit === "D";
-
-        fallback.classList.add(
-            red ? "red" : "black"
-        );
-
-        fallback.textContent =
-            `${card.rank}${suitSymbol(card.suit)}`;
-
-        img.replaceWith(fallback);
-
-    };
-
-    return img;
-
+    return div;
 }

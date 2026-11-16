@@ -1,15 +1,15 @@
 export class Player {
 
-    constructor(name, chips = 1000) {
+    constructor(name, isBot = false) {
 
         this.name = name;
-
-        this.chips = chips;
+        this.isBot = isBot;
 
         this.hand = [];
 
-        this.folded = false;
+        this.chips = 1000;
 
+        this.folded = false;
     }
 
 }

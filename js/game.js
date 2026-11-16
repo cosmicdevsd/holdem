@@ -1,76 +1,58 @@
-export class Deck {
+import { Deck } from "./deck.js";
+import { Player } from "./player.js";
+
+export class PokerGame {
 
     constructor() {
-        this.cards = [];
+
+        this.deck = new Deck();
+
+        this.players = [
+            new Player("You"),
+            new Player("Bot 1", true),
+            new Player("Bot 2", true),
+            new Player("Bot 3", true)
+        ];
+
+        this.communityCards = [];
+
+        this.pot = 0;
+
+        this.dealerPosition = 0;
     }
 
-    build() {
+    startHand() {
 
-        this.cards = [];
+        this.deck.build();
 
-        const suits = [
-            "H",
-            "D",
-            "C",
-            "S"
-        ];
+        this.deck.shuffle();
 
-        const ranks = [
-            "A",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9",
-            "10",
-            "J",
-            "Q",
-            "K"
-        ];
+        this.communityCards = [];
 
-        for (const suit of suits) {
+        this.players.forEach(
+            p => p.hand = []
+        );
 
-            for (const rank of ranks) {
+        for (let i = 0; i < 2; i++) {
 
-                this.cards.push({
-                    rank,
-                    suit
-                });
+            for (const player of this.players) {
+
+                player.hand.push(
+                    this.deck.deal()
+                );
 
             }
 
         }
 
-    }
+        for (let i = 0; i < 5; i++) {
 
-    shuffle() {
-
-        for (let i = this.cards.length - 1; i > 0; i--) {
-
-            const random = new Uint32Array(1);
-
-            crypto.getRandomValues(random);
-
-            const j = random[0] % (i + 1);
-
-            [
-                this.cards[i],
-                this.cards[j]
-            ] =
-            [
-                this.cards[j],
-                this.cards[i]
-            ];
+            this.communityCards.push(
+                this.deck.deal()
+            );
 
         }
 
-    }
-
-    deal() {
-        return this.cards.pop();
     }
 
 }

@@ -1,15 +1,14 @@
 export function log(message) {
-    console.log(`[Poker] ${message}`);
 
-    const logArea =
+    console.log(message);
+
+    const logBox =
         document.getElementById("log");
 
-    if (!logArea) return;
-
-    const entry =
+    const div =
         document.createElement("div");
 
-    entry.textContent = message;
+    div.textContent = message;
 
-    logArea.prepend(entry);
+    logBox.prepend(div);
 }

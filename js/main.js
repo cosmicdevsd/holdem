@@ -1,31 +1,101 @@
 import { PokerGame } from "./game.js";
-import { createCardElement } from "./ui.js";
+import { createCard } from "./ui.js";
 import { log } from "./logger.js";
 
-log("main.js loaded");
-
-const game = new PokerGame();
-
-log("PokerGame created");
+const game =
+    new PokerGame();
 
 game.startHand();
 
-log("Hand started");
+log("New hand started.");
 
-const playerArea =
+const seats = {
+
+    top:
     document.getElementById(
-        "player-area"
-    );
+        "top-seat"
+    ),
 
-log("Rendering player cards");
+    left:
+    document.getElementById(
+        "left-seat"
+    ),
 
-for (const card of game.players[0].hand) {
+    right:
+    document.getElementById(
+        "right-seat"
+    ),
 
-    playerArea.appendChild(
-        createCardElement(card)
-    );
+    player:
+    document.getElementById(
+        "player-seat"
+    )
+};
 
-    log(
-        `Rendered ${card.rank}${card.suit}`
-    );
+const seatOrder = [
+    "player",
+    "left",
+    "top",
+    "right"
+];
+
+for (let i = 0; i < 4; i++) {
+
+    const player =
+        game.players[i];
+
+    const container =
+        seats[
+            seatOrder[i]
+        ];
+
+    const name =
+        document.createElement("div");
+
+    name.className =
+        "player-name";
+
+    name.textContent =
+        player.name;
+
+    container.appendChild(name);
+
+    const cards =
+        document.createElement("div");
+
+    cards.className =
+        "cards";
+
+    if (player.isBot) {
+
+        cards.innerHTML =
+            "<div class='card'>🂠</div>" +
+            "<div class='card'>🂠</div>";
+
+    } else {
+
+        player.hand.forEach(card => {
+
+            cards.appendChild(
+                createCard(card)
+            );
+
+        });
+
+    }
+
+    container.appendChild(cards);
 }
+
+const board =
+document.getElementById(
+    "community-cards"
+);
+
+game.communityCards.forEach(card => {
+
+    board.appendChild(
+        createCard(card)
+    );
+
+});

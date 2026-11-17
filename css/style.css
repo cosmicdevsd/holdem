@@ -1,9 +1,9 @@
 body {
-    margin: 0;
-    background: #0a5e2a;
+    background: #0a5d27;
     color: white;
     font-family: Arial, sans-serif;
     text-align: center;
+    margin: 0;
 }
 
 h1 {
@@ -12,93 +12,176 @@ h1 {
 
 #table {
 
-    width: 1000px;
-    margin: auto;
+    width: 1200px;
 
-    padding: 20px;
+    min-height: 700px;
 
-    background: #0f7036;
+    margin: 20px auto;
 
-    border: 12px solid #4a2a10;
+    padding: 30px;
+
+    background: #117236;
+
+    border: 14px solid #4f2f18;
 
     border-radius: 400px;
+
+    box-sizing: border-box;
+}
+
+#middle-row {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
 }
 
 #top-seat,
 #left-seat,
 #right-seat,
 #player-seat {
+
     min-height: 180px;
+
+    min-width: 180px;
 }
 
-#middle-row {
+#board-area {
+
+    width: 700px;
+
+    text-align: center;
+}
+
+#pot {
+
+    width: 300px;
+
+    height: 80px;
+
+    margin: 0 auto 25px auto;
+
+    border: 3px solid gold;
+
+    border-radius: 10px;
+
+    background: rgba(0,0,0,0.25);
+
     display: flex;
-    justify-content: space-between;
+
+    justify-content: center;
+
     align-items: center;
+
+    font-size: 28px;
+
+    font-weight: bold;
 }
 
-.player-name {
-    font-weight: bold;
-    margin-bottom: 8px;
+#community-cards {
+
+    min-height: 150px;
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    margin-bottom: 25px;
 }
 
 .cards {
+
     display: flex;
+
     justify-content: center;
-    gap: 8px;
+
+    gap: 10px;
 }
 
 .card {
 
     width: 100px;
+
     height: 140px;
+
+    border-radius: 10px;
 
     background: white;
 
-    border-radius: 12px;
+    color: black;
 
     display: flex;
-    align-items: center;
+
     justify-content: center;
 
+    align-items: center;
+
     font-size: 30px;
+
     font-weight: bold;
 }
 
-.red {
-    color: #d02020;
+.player-name {
+
+    font-weight: bold;
+
+    margin-bottom: 10px;
 }
 
-.black {
-    color: black;
-}
-
-#community-cards {
+#chip-tray {
 
     display: flex;
-    gap: 8px;
+
     justify-content: center;
 
-    margin-top: 20px;
+    gap: 15px;
+
+    min-height: 80px;
 }
 
-#pot {
-    font-size: 24px;
-    margin-bottom: 15px;
+.chip-stack {
+
+    width: 60px;
+}
+
+.chip {
+
+    width: 60px;
+
+    height: 60px;
+
+    border-radius: 50%;
+
+    border: 3px solid white;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    font-weight: bold;
+
+    cursor: pointer;
 }
 
 #log {
 
     width: 1000px;
-    height: 220px;
 
-    overflow-y: auto;
+    height: 200px;
 
     margin: 20px auto;
 
     background: #111;
 
     border: 2px solid #555;
+
+    overflow-y: auto;
 
     text-align: left;
 

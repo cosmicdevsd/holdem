@@ -1,16 +1,20 @@
 import { PokerGame } from "./game.js";
+import { ChipManager } from "./chips.js";
+
 import {
     createCard,
     createBackCard
 } from "./ui.js";
 
-import { ChipManager }
-from "./chips.js";
-
 import {
     log,
     handBanner
 } from "./logger.js";
+
+import {
+    getAiAction,
+    getRaiseAmount
+} from "./ai.js";
 
 const game =
     new PokerGame();
@@ -22,9 +26,7 @@ let handNumber = 1;
 
 game.startHand();
 
-handBanner(
-    handNumber
-);
+handBanner(handNumber);
 
 render();
 
@@ -73,30 +75,36 @@ function renderPlayers() {
 
         seat.innerHTML = "";
 
-        let badge = "";
+        let badges = "";
 
         if (
             i ===
             game.dealerPosition
         ) {
-            badge +=
+
+            badges +=
                 " [D]";
+
         }
 
         if (
             i ===
             game.smallBlindPosition
         ) {
-            badge +=
+
+            badges +=
                 " [SB]";
+
         }
 
         if (
             i ===
             game.bigBlindPosition
         ) {
-            badge +=
+
+            badges +=
                 " [BB]";
+
         }
 
         const title =
@@ -110,7 +118,7 @@ function renderPlayers() {
         title.innerHTML = `
             <strong>
                 ${player.name}
-                ${badge}
+                ${badges}
             </strong>
             <br>
             $${player.chips}
@@ -178,10 +186,10 @@ function renderBoard() {
 
     board.innerHTML = "";
 
-    const cards =
+    const visibleCards =
         game.getVisibleCommunityCards();
 
-    cards.forEach(
+    visibleCards.forEach(
         card => {
 
             board.appendChild(
@@ -210,17 +218,24 @@ function renderPot() {
             "pot"
         );
 
-    let winnerText =
-        "";
+    let extra = "";
 
     if (
         game.lastWinner
     ) {
 
-        winnerText =
-            `<br>${game.lastWinner.name}
-             - ${game.lastWinner.handResult.name}`;
-
+        extra =
+        `
+        <br>
+        Winner:
+        ${game.lastWinner.name}
+        <br>
+        ${
+            game.lastWinner
+                .handResult
+                ?.name || ""
+        }
+        `;
     }
 
     pot.innerHTML = `
@@ -233,7 +248,7 @@ function renderPot() {
 
             ${game.street.toUpperCase()}
 
-            ${winnerText}
+            ${extra}
 
         </div>
     `;
@@ -249,7 +264,7 @@ function renderBettingArea() {
 
     tray.innerHTML = "";
 
-    const buttonRow =
+    const controls =
         document.createElement(
             "div"
         );
@@ -341,6 +356,10 @@ function renderBettingArea() {
             game.pot +=
                 paid;
 
+            game.players[0]
+                .lastAction =
+                "Bet";
+
             log(
                 `You bet $${paid}`
             );
@@ -351,38 +370,41 @@ function renderBettingArea() {
 
         };
 
-    buttonRow.appendChild(
+    controls.appendChild(
         call
     );
 
-    buttonRow.appendChild(
+    controls.appendChild(
         raise
     );
 
-    buttonRow.appendChild(
+    controls.appendChild(
         fold
     );
 
-    buttonRow.appendChild(
+    controls.appendChild(
         confirm
     );
 
     tray.appendChild(
-        buttonRow
+        controls
     );
 
-    const stacks =
+    const stackRow =
         document.createElement(
             "div"
         );
 
-    stacks.style.display =
+    stackRow.style.display =
         "flex";
 
-    stacks.style.justifyContent =
+    stackRow.style.gap =
+        "10px";
+
+    stackRow.style.justifyContent =
         "center";
 
-    stacks.style.gap =
+    stackRow.style.marginTop =
         "10px";
 
     for (
@@ -390,16 +412,16 @@ function renderBettingArea() {
         of chips.values
     ) {
 
-        const stack =
+        const button =
             document.createElement(
                 "button"
             );
 
-        stack.textContent =
+        button.textContent =
             `$${value}
              x${chips.stacks[value]}`;
 
-        stack.onclick =
+        button.onclick =
             () => {
 
                 if (
@@ -414,14 +436,14 @@ function renderBettingArea() {
 
             };
 
-        stacks.appendChild(
-            stack
+        stackRow.appendChild(
+            button
         );
 
     }
 
     tray.appendChild(
-        stacks
+        stackRow
     );
 
     const betArea =
@@ -430,11 +452,13 @@ function renderBettingArea() {
         );
 
     betArea.style.marginTop =
-        "10px";
+        "12px";
 
     betArea.innerHTML =
-        `Current Bet:
-         $${chips.getBetTotal()}`;
+        `
+        Current Bet:
+        $${chips.getBetTotal()}
+        `;
 
     tray.appendChild(
         betArea
@@ -479,17 +503,17 @@ function runAi() {
         if (
             player.folded
         ) {
-
             continue;
-
         }
 
         const action =
-            game.aiDecision();
+            getAiAction(
+                player,
+                game
+            );
 
         if (
-            action ===
-            "fold"
+            action === "fold"
         ) {
 
             player.fold();
@@ -500,7 +524,9 @@ function runAi() {
 
         }
 
-        else {
+        else if (
+            action === "call"
+        ) {
 
             const paid =
                 player.bet(
@@ -510,11 +536,38 @@ function runAi() {
             game.pot +=
                 paid;
 
-            player.lastAction =
-                action;
+            player.call();
 
             log(
-                `${player.name} ${action}s`
+                `${player.name} calls`
+            );
+
+        }
+
+        else {
+
+            const raiseAmount =
+                getRaiseAmount(
+                    player,
+                    game
+                );
+
+            game.currentBet +=
+                raiseAmount;
+
+            const paid =
+                player.bet(
+                    game.currentBet
+                );
+
+            game.pot +=
+                paid;
+
+            player.raise();
+
+            log(
+                `${player.name}
+                 raises $${raiseAmount}`
             );
 
         }
@@ -528,7 +581,9 @@ function showWinner() {
     const winner =
         game.lastWinner;
 
-    if (!winner) {
+    if (
+        !winner
+    ) {
 
         return;
 

@@ -1,28 +1,54 @@
 import { PokerGame } from "./game.js";
-import { createCard } from "./ui.js";
+import {
+    createCard,
+    createBackCard
+} from "./ui.js";
+
 import { log } from "./logger.js";
 
 log("main.js loaded");
 
-const game = new PokerGame();
-
-log("PokerGame created");
+const game =
+    new PokerGame();
 
 game.startHand();
 
 log("Hand started");
 
-const playerSeat = document.getElementById("player-seat");
-const leftSeat = document.getElementById("left-seat");
-const topSeat = document.getElementById("top-seat");
-const rightSeat = document.getElementById("right-seat");
-const board = document.getElementById("community-cards");
+const playerSeat =
+    document.getElementById(
+        "player-seat"
+    );
 
-if (!playerSeat) console.error("Missing player-seat");
-if (!leftSeat) console.error("Missing left-seat");
-if (!topSeat) console.error("Missing top-seat");
-if (!rightSeat) console.error("Missing right-seat");
-if (!board) console.error("Missing community-cards");
+const leftSeat =
+    document.getElementById(
+        "left-seat"
+    );
+
+const topSeat =
+    document.getElementById(
+        "top-seat"
+    );
+
+const rightSeat =
+    document.getElementById(
+        "right-seat"
+    );
+
+const board =
+    document.getElementById(
+        "community-cards"
+    );
+
+const chipTray =
+    document.getElementById(
+        "chip-tray"
+    );
+
+const pot =
+    document.getElementById(
+        "pot"
+    );
 
 const seats = [
     playerSeat,
@@ -31,40 +57,64 @@ const seats = [
     rightSeat
 ];
 
-for (let i = 0; i < game.players.length; i++) {
+for (
+    let i = 0;
+    i < game.players.length;
+    i++
+) {
 
-    const player = game.players[i];
-    const seat = seats[i];
+    const player =
+        game.players[i];
 
-    if (!seat) {
+    const seat =
+        seats[i];
+
+    if (!seat)
         continue;
-    }
 
     seat.innerHTML = "";
 
-    const name = document.createElement("div");
+    const name =
+        document.createElement(
+            "div"
+        );
 
-    name.className = "player-name";
-    name.textContent = player.name;
+    name.className =
+        "player-name";
+
+    name.textContent =
+        player.name;
 
     seat.appendChild(name);
 
-    const cardArea = document.createElement("div");
+    const hand =
+        document.createElement(
+            "div"
+        );
 
-    cardArea.className = "cards";
+    hand.className =
+        "cards";
 
-    if (player.isBot) {
+    if (
+        player.isBot
+    ) {
 
-        cardArea.innerHTML = `
-            <div class="card">🂠</div>
-            <div class="card">🂠</div>
-        `;
+        hand.appendChild(
+            createBackCard()
+        );
+
+        hand.appendChild(
+            createBackCard()
+        );
 
     } else {
 
-        for (const card of player.hand) {
+        for (
+            const card
+            of player.hand
+        ) {
 
-            cardArea.appendChild(
+            hand.appendChild(
                 createCard(card)
             );
 
@@ -72,29 +122,103 @@ for (let i = 0; i < game.players.length; i++) {
 
     }
 
-    seat.appendChild(cardArea);
+    seat.appendChild(
+        hand
+    );
 
 }
 
-if (board) {
+board.innerHTML = "";
 
-    board.innerHTML = "";
+for (
+    let i = 0;
+    i < 5;
+    i++
+) {
 
-    for (const card of game.communityCards) {
+    board.appendChild(
+        createBackCard()
+    );
 
-        board.appendChild(
-            createCard(card)
+}
+
+pot.textContent =
+    `POT: $${game.pot}`;
+
+chipTray.innerHTML = "";
+
+for (
+    const value
+    in game.chips
+) {
+
+    const stack =
+        document.createElement(
+            "div"
         );
 
-    }
+    stack.className =
+        "chip-stack";
 
-}
+    const chip =
+        document.createElement(
+            "div"
+        );
 
-const pot = document.getElementById("pot");
+    chip.className =
+        "chip";
 
-if (pot) {
+    chip.textContent =
+        `$${value}`;
 
-    pot.textContent = `Pot: $${game.pot}`;
+    const count =
+        document.createElement(
+            "div"
+        );
+
+    count.textContent =
+        `x${game.chips[value]}`;
+
+    chip.addEventListener(
+        "click",
+        () => {
+
+            if (
+                game.chips[value]
+                <= 0
+            ) {
+                return;
+            }
+
+            game.chips[value]--;
+
+            game.pot +=
+                Number(value);
+
+            count.textContent =
+                `x${game.chips[value]}`;
+
+            pot.textContent =
+                `POT: $${game.pot}`;
+
+            log(
+                `Added $${value} chip to pot`
+            );
+
+        }
+    );
+
+    stack.appendChild(
+        chip
+    );
+
+    stack.appendChild(
+        count
+    );
+
+    chipTray.appendChild(
+        stack
+    );
 
 }
 

@@ -1,65 +1,94 @@
-const MAX_LOG_LINES = 250;
+export class Player {
 
-export function log(message) {
-
-    console.log(
-        `[Poker] ${message}`
-    );
-
-    const logBox =
-        document.getElementById(
-            "log"
-        );
-
-    if (!logBox) {
-        return;
-    }
-
-    const line =
-        document.createElement(
-            "div"
-        );
-
-    const now =
-        new Date();
-
-    const timestamp =
-        now.toLocaleTimeString();
-
-    line.textContent =
-        `[${timestamp}] ${message}`;
-
-    logBox.prepend(line);
-
-    while (
-        logBox.children.length >
-        MAX_LOG_LINES
+    constructor(
+        name,
+        isBot = false
     ) {
 
-        logBox.removeChild(
-            logBox.lastChild
-        );
+        this.name = name;
+
+        this.isBot = isBot;
+
+        this.chips = 1000;
+
+        this.hand = [];
+
+        this.folded = false;
+
+        this.allIn = false;
+
+        this.currentBet = 0;
+
+        this.totalContribution = 0;
+
+        this.lastAction = "Waiting";
+
+        this.handResult = null;
 
     }
 
-}
+    resetForHand() {
 
-export function separator() {
+        this.hand = [];
 
-    log(
-        "------------------------------------------"
-    );
+        this.folded = false;
 
-}
+        this.allIn = false;
 
-export function handBanner(number) {
+        this.currentBet = 0;
 
-    separator();
+        this.totalContribution = 0;
 
-    log(
-        `HAND ${number}`
-    );
+        this.lastAction = "Waiting";
 
-    separator();
+        this.handResult = null;
+
+    }
+
+    bet(amount) {
+
+        if (amount > this.chips) {
+
+            amount = this.chips;
+
+            this.allIn = true;
+
+        }
+
+        this.chips -= amount;
+
+        this.currentBet += amount;
+
+        this.totalContribution += amount;
+
+        return amount;
+
+    }
+
+    fold() {
+
+        this.folded = true;
+
+        this.lastAction = "Fold";
+
+    }
+
+    call() {
+
+        this.lastAction = "Call";
+
+    }
+
+    raise() {
+
+        this.lastAction = "Raise";
+
+    }
+
+    check() {
+
+        this.lastAction = "Check";
+
+    }
 
 }

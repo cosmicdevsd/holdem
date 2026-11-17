@@ -5,7 +5,7 @@ import {
 } from "./ui.js";
 
 import { ChipManager }
-    from "./chips.js";
+from "./chips.js";
 
 import {
     log,
@@ -22,7 +22,9 @@ let handNumber = 1;
 
 game.startHand();
 
-handBanner(handNumber);
+handBanner(
+    handNumber
+);
 
 render();
 
@@ -71,6 +73,32 @@ function renderPlayers() {
 
         seat.innerHTML = "";
 
+        let badge = "";
+
+        if (
+            i ===
+            game.dealerPosition
+        ) {
+            badge +=
+                " [D]";
+        }
+
+        if (
+            i ===
+            game.smallBlindPosition
+        ) {
+            badge +=
+                " [SB]";
+        }
+
+        if (
+            i ===
+            game.bigBlindPosition
+        ) {
+            badge +=
+                " [BB]";
+        }
+
         const title =
             document.createElement(
                 "div"
@@ -79,9 +107,16 @@ function renderPlayers() {
         title.className =
             "player-name";
 
-        title.textContent =
-            `${player.name}
-            ($${player.chips})`;
+        title.innerHTML = `
+            <strong>
+                ${player.name}
+                ${badge}
+            </strong>
+            <br>
+            $${player.chips}
+            <br>
+            ${player.lastAction}
+        `;
 
         seat.appendChild(
             title
@@ -175,8 +210,20 @@ function renderPot() {
             "pot"
         );
 
-    pot.innerHTML = `
+    let winnerText =
+        "";
 
+    if (
+        game.lastWinner
+    ) {
+
+        winnerText =
+            `<br>${game.lastWinner.name}
+             - ${game.lastWinner.handResult.name}`;
+
+    }
+
+    pot.innerHTML = `
         <div>
 
             Pot:
@@ -184,13 +231,11 @@ function renderPot() {
 
             <br>
 
-            ${
-                game.street
-                .toUpperCase()
-            }
+            ${game.street.toUpperCase()}
+
+            ${winnerText}
 
         </div>
-
     `;
 
 }
@@ -334,11 +379,11 @@ function renderBettingArea() {
     stacks.style.display =
         "flex";
 
-    stacks.style.gap =
-        "10px";
-
     stacks.style.justifyContent =
         "center";
+
+    stacks.style.gap =
+        "10px";
 
     for (
         const value
@@ -352,7 +397,7 @@ function renderBettingArea() {
 
         stack.textContent =
             `$${value}
-            x${chips.stacks[value]}`;
+             x${chips.stacks[value]}`;
 
         stack.onclick =
             () => {
@@ -387,12 +432,13 @@ function renderBettingArea() {
     betArea.style.marginTop =
         "10px";
 
-    betArea.textContent =
-        `Bet:
-        $${chips.getBetTotal()}`;
+    betArea.innerHTML =
+        `Current Bet:
+         $${chips.getBetTotal()}`;
 
     tray.appendChild(
-        betArea );
+        betArea
+    );
 
 }
 
@@ -433,7 +479,9 @@ function runAi() {
         if (
             player.folded
         ) {
+
             continue;
+
         }
 
         const action =
@@ -447,8 +495,7 @@ function runAi() {
             player.fold();
 
             log(
-                `${player.name}
-                folds`
+                `${player.name} folds`
             );
 
         }
@@ -463,9 +510,11 @@ function runAi() {
             game.pot +=
                 paid;
 
+            player.lastAction =
+                action;
+
             log(
-                `${player.name}
-                ${action}s`
+                `${player.name} ${action}s`
             );
 
         }
@@ -480,18 +529,20 @@ function showWinner() {
         game.lastWinner;
 
     if (!winner) {
+
         return;
+
     }
 
     log(
         `${winner.name}
-        wins the hand`
+         wins the hand`
     );
 
     log(
         `${winner.name}
-        shows
-        ${winner.handResult.name}`
+         shows
+         ${winner.handResult.name}`
     );
 
     setTimeout(
@@ -508,9 +559,7 @@ function showWinner() {
             render();
 
         },
-
         4000
-
     );
 
 }

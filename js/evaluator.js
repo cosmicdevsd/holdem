@@ -1,4 +1,4 @@
-evaluateHand(cardsexport function evaluateHand(cards) {
+export function evaluateHand(cards) {
 
     const rankCounts = {};
     const suitCounts = {};
@@ -24,27 +24,15 @@ evaluateHand(cardsexport function evaluateHand(cards) {
     for (const card of cards) {
 
         const value =
-            valueMap[
-                card.rank
-            ];
+            valueMap[card.rank];
 
         values.push(value);
 
-        rankCounts[
-            value
-        ] =
-        (
-            rankCounts[value] || 0
-        ) + 1;
+        rankCounts[value] =
+            (rankCounts[value] || 0) + 1;
 
-        suitCounts[
-            card.suit
-        ] =
-        (
-            suitCounts[
-                card.suit
-            ] || 0
-        ) + 1;
+        suitCounts[card.suit] =
+            (suitCounts[card.suit] || 0) + 1;
 
     }
 
@@ -53,24 +41,16 @@ evaluateHand(cardsexport function evaluateHand(cards) {
     );
 
     const counts =
-        Object.values(
-            rankCounts
-        );
+        Object.values(rankCounts);
 
     const flush =
-        Object.values(
-            suitCounts
-        ).some(
-            count => count >= 5
-        );
+        Object.values(suitCounts)
+        .some(count => count >= 5);
 
-    let straight =
-        false;
+    let straight = false;
 
     const unique =
-        [
-            ...new Set(values)
-        ];
+        [...new Set(values)];
 
     for (
         let i = 0;
@@ -82,38 +62,7 @@ evaluateHand(cardsexport function evaluateHand(cards) {
             unique[i + 4] -
             unique[i] === 4
         ) {
-
             straight = true;
-
-        }
-
-    }
-
-    if (
-        unique.includes(14)
-    ) {
-
-        const lowAce =
-            [
-                1,
-                ...unique
-            ];
-
-        for (
-            let i = 0;
-            i <= lowAce.length - 5;
-            i++
-        ) {
-
-            if (
-                lowAce[i + 4] -
-                lowAce[i] === 4
-            ) {
-
-                straight = true;
-
-            }
-
         }
 
     }
@@ -140,21 +89,6 @@ evaluateHand(cardsexport function evaluateHand(cards) {
 
     if (
         straight &&
-        flush &&
-        Math.max(
-            ...values
-        ) === 14
-    ) {
-
-        return {
-            rank: 10,
-            name: "Royal Flush"
-        };
-
-    }
-
-    if (
-        straight &&
         flush
     ) {
 
@@ -165,9 +99,7 @@ evaluateHand(cardsexport function evaluateHand(cards) {
 
     }
 
-    if (
-        fourKind
-    ) {
+    if (fourKind) {
 
         return {
             rank: 8,
@@ -176,9 +108,7 @@ evaluateHand(cardsexport function evaluateHand(cards) {
 
     }
 
-    if (
-        fullHouse
-    ) {
+    if (fullHouse) {
 
         return {
             rank: 7,
@@ -187,9 +117,7 @@ evaluateHand(cardsexport function evaluateHand(cards) {
 
     }
 
-    if (
-        flush
-    ) {
+    if (flush) {
 
         return {
             rank: 6,
@@ -198,9 +126,7 @@ evaluateHand(cardsexport function evaluateHand(cards) {
 
     }
 
-    if (
-        straight
-    ) {
+    if (straight) {
 
         return {
             rank: 5,
@@ -209,9 +135,7 @@ evaluateHand(cardsexport function evaluateHand(cards) {
 
     }
 
-    if (
-        threeKind
-    ) {
+    if (threeKind) {
 
         return {
             rank: 4,
@@ -220,9 +144,7 @@ evaluateHand(cardsexport function evaluateHand(cards) {
 
     }
 
-    if (
-        pairs >= 2
-    ) {
+    if (pairs >= 2) {
 
         return {
             rank: 3,
@@ -231,9 +153,7 @@ evaluateHand(cardsexport function evaluateHand(cards) {
 
     }
 
-    if (
-        pairs === 1
-    ) {
+    if (pairs === 1) {
 
         return {
             rank: 2,
@@ -249,7 +169,10 @@ evaluateHand(cardsexport function evaluateHand(cards) {
 
 }
 
-export function determineWinner(players, communityCards) {
+export function determineWinner(
+    players,
+    communityCards
+) {
 
     let winners = [];
 
@@ -257,9 +180,7 @@ export function determineWinner(players, communityCards) {
 
     for (const player of players) {
 
-        if (
-            player.folded
-        ) {
+        if (player.folded) {
             continue;
         }
 
@@ -277,11 +198,11 @@ export function determineWinner(players, communityCards) {
             bestRank
         ) {
 
-            winners =
-                [player];
-
             bestRank =
                 result.rank;
+
+            winners =
+                [player];
 
         }
 

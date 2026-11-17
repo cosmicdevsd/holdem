@@ -6,220 +6,372 @@ import {
 
 import { log } from "./logger.js";
 
-log("main.js loaded");
-
-const game =
-    new PokerGame();
+const game = new PokerGame();
 
 game.startHand();
 
-log("Hand started");
+function render() {
 
-const playerSeat =
-    document.getElementById(
-        "player-seat"
-    );
+    const playerSeat =
+        document.getElementById("player-seat");
 
-const leftSeat =
-    document.getElementById(
-        "left-seat"
-    );
+    const leftSeat =
+        document.getElementById("left-seat");
 
-const topSeat =
-    document.getElementById(
-        "top-seat"
-    );
+    const topSeat =
+        document.getElementById("top-seat");
 
-const rightSeat =
-    document.getElementById(
-        "right-seat"
-    );
+    const rightSeat =
+        document.getElementById("right-seat");
 
-const board =
-    document.getElementById(
-        "community-cards"
-    );
+    const board =
+        document.getElementById("community-cards");
 
-const chipTray =
-    document.getElementById(
-        "chip-tray"
-    );
+    const chipTray =
+        document.getElementById("chip-tray");
 
-const pot =
-    document.getElementById(
-        "pot"
-    );
+    const pot =
+        document.getElementById("pot");
 
-const seats = [
-    playerSeat,
-    leftSeat,
-    topSeat,
-    rightSeat
-];
+    const seats = [
+        playerSeat,
+        leftSeat,
+        topSeat,
+        rightSeat
+    ];
 
-for (
-    let i = 0;
-    i < game.players.length;
-    i++
-) {
-
-    const player =
-        game.players[i];
-
-    const seat =
-        seats[i];
-
-    if (!seat)
-        continue;
-
-    seat.innerHTML = "";
-
-    const name =
-        document.createElement(
-            "div"
-        );
-
-    name.className =
-        "player-name";
-
-    name.textContent =
-        player.name;
-
-    seat.appendChild(name);
-
-    const hand =
-        document.createElement(
-            "div"
-        );
-
-    hand.className =
-        "cards";
-
-    if (
-        player.isBot
+    for (
+        let i = 0;
+        i < game.players.length;
+        i++
     ) {
 
-        hand.appendChild(
-            createBackCard()
-        );
+        const player =
+            game.players[i];
 
-        hand.appendChild(
-            createBackCard()
-        );
+        const seat =
+            seats[i];
 
-    } else {
+        seat.innerHTML = "";
 
-        for (
-            const card
-            of player.hand
+        const name =
+            document.createElement("div");
+
+        name.className =
+            "player-name";
+
+        let label =
+            player.name;
+
+        if (
+            i === game.dealerPosition
         ) {
+            label += " (D)";
+        }
+
+        if (
+            i === game.smallBlindPosition
+        ) {
+            label += " (SB)";
+        }
+
+        if (
+            i === game.bigBlindPosition
+        ) {
+            label += " (BB)";
+        }
+
+        name.textContent =
+            `${label} - $${player.chips}`;
+
+        seat.appendChild(name);
+
+        const hand =
+            document.createElement("div");
+
+        hand.className =
+            "cards";
+
+        if (player.isBot) {
 
             hand.appendChild(
-                createCard(card)
+                createBackCard()
+            );
+
+            hand.appendChild(
+                createBackCard()
+            );
+
+        } else {
+
+            for (
+                const card
+                of player.hand
+            ) {
+
+                hand.appendChild(
+                    createCard(card)
+                );
+
+            }
+
+        }
+
+        seat.appendChild(
+            hand
+        );
+
+    }
+
+    pot.innerHTML = `
+        <div>
+            POT: $${game.pot}<br>
+            STREET:
+            ${game.street.toUpperCase()}
+        </div>
+    `;
+
+    board.innerHTML = "";
+
+    const visible =
+        game.getVisibleCommunityCards();
+
+    for (
+        let i = 0;
+        i < visible.length;
+        i++
+    ) {
+
+        board.appendChild(
+            createCard(
+                visible[i]
+            )
+        );
+
+    }
+
+    for (
+        let i = visible.length;
+        i < 5;
+        i++
+    ) {
+
+        board.appendChild(
+            createBackCard()
+        );
+
+    }
+
+    chipTray.innerHTML = "";
+
+    createActionButtons(
+        chipTray
+    );
+
+}
+
+function createActionButtons(
+    container
+) {
+
+    const fold =
+        document.createElement(
+            "button"
+        );
+
+    const call =
+        document.createElement(
+            "button"
+        );
+
+    const raise =
+        document.createElement(
+            "button"
+        );
+
+    fold.textContent =
+        "Fold";
+
+    call.textContent =
+        "Call";
+
+    raise.textContent =
+        "Raise";
+
+    fold.onclick =
+        () => {
+
+            log(
+                "You folded."
+            );
+
+            nextStreet();
+
+        };
+
+    call.onclick =
+        () => {
+
+            game.players[0].chips -=
+                game.currentBet;
+
+            game.pot +=
+                game.currentBet;
+
+            log(
+                `You called $${game.currentBet}`
+            );
+
+            aiRound();
+
+            nextStreet();
+
+        };
+
+    raise.onclick =
+        () => {
+
+            game.currentBet +=
+                10;
+
+            game.players[0].chips -=
+                game.currentBet;
+
+            game.pot +=
+                game.currentBet;
+
+            log(
+                `You raised to $${game.currentBet}`
+            );
+
+            aiRound();
+
+            nextStreet();
+
+        };
+
+    container.appendChild(
+        fold
+    );
+
+    container.appendChild(
+        call
+    );
+
+    container.appendChild(
+        raise
+    );
+
+}
+
+function aiRound() {
+
+    for (
+        let i = 1;
+        i < game.players.length;
+        i++
+    ) {
+
+        const player =
+            game.players[i];
+
+        if (
+            player.folded
+        ) {
+            continue;
+        }
+
+        const action =
+            game.aiDecision();
+
+        if (
+            action === "fold"
+        ) {
+
+            player.folded =
+                true;
+
+            log(
+                `${player.name} folds`
+            );
+
+        }
+
+        else if (
+            action === "call"
+        ) {
+
+            player.chips -=
+                game.currentBet;
+
+            game.pot +=
+                game.currentBet;
+
+            log(
+                `${player.name} calls`
+            );
+
+        }
+
+        else {
+
+            game.currentBet +=
+                10;
+
+            player.chips -=
+                game.currentBet;
+
+            game.pot +=
+                game.currentBet;
+
+            log(
+                `${player.name} raises`
             );
 
         }
 
     }
 
-    seat.appendChild(
-        hand
-    );
+}
+
+function nextStreet() {
+
+    game.advanceStreet();
+
+    if (
+        game.street ===
+        "showdown"
+    ) {
+
+        log(
+            "Showdown."
+        );
+
+        render();
+
+        setTimeout(
+            () => {
+
+                log(
+                    "New hand."
+                );
+
+                game.nextHand();
+
+                render();
+
+            },
+            3000
+        );
+
+        return;
+
+    }
+
+    render();
 
 }
 
-board.innerHTML = "";
+render();
 
-for (
-    let i = 0;
-    i < 5;
-    i++
-) {
-
-    board.appendChild(
-        createBackCard()
-    );
-
-}
-
-pot.textContent =
-    `POT: $${game.pot}`;
-
-chipTray.innerHTML = "";
-
-for (
-    const value
-    in game.chips
-) {
-
-    const stack =
-        document.createElement(
-            "div"
-        );
-
-    stack.className =
-        "chip-stack";
-
-    const chip =
-        document.createElement(
-            "div"
-        );
-
-    chip.className =
-        "chip";
-
-    chip.textContent =
-        `$${value}`;
-
-    const count =
-        document.createElement(
-            "div"
-        );
-
-    count.textContent =
-        `x${game.chips[value]}`;
-
-    chip.addEventListener(
-        "click",
-        () => {
-
-            if (
-                game.chips[value]
-                <= 0
-            ) {
-                return;
-            }
-
-            game.chips[value]--;
-
-            game.pot +=
-                Number(value);
-
-            count.textContent =
-                `x${game.chips[value]}`;
-
-            pot.textContent =
-                `POT: $${game.pot}`;
-
-            log(
-                `Added $${value} chip to pot`
-            );
-
-        }
-    );
-
-    stack.appendChild(
-        chip
-    );
-
-    stack.appendChild(
-        count
-    );
-
-    chipTray.appendChild(
-        stack
-    );
-
-}
-
-log("Render complete");
+log("Game started.");

@@ -10,7 +10,46 @@ const game = new PokerGame();
 
 game.startHand();
 
+announceNewHand();
+
+function announceNewHand() {
+
+    log("");
+    log("===== NEW HAND =====");
+
+    log(
+        `Dealer: ${
+            game.getDealer().name
+        }`
+    );
+
+    log(
+        `Small Blind: ${
+            game.getSmallBlindPlayer().name
+        } ($5)`
+    );
+
+    log(
+        `Big Blind: ${
+            game.getBigBlindPlayer().name
+        } ($10)`
+    );
+
+}
+
 function render() {
+
+    renderPlayers();
+
+    renderBoard();
+
+    renderPot();
+
+    renderActions();
+
+}
+
+function renderPlayers() {
 
     const playerSeat =
         document.getElementById("player-seat");
@@ -23,15 +62,6 @@ function render() {
 
     const rightSeat =
         document.getElementById("right-seat");
-
-    const board =
-        document.getElementById("community-cards");
-
-    const chipTray =
-        document.getElementById("chip-tray");
-
-    const pot =
-        document.getElementById("pot");
 
     const seats = [
         playerSeat,
@@ -64,21 +94,27 @@ function render() {
             player.name;
 
         if (
-            i === game.dealerPosition
+            i ===
+            game.dealerPosition
         ) {
-            label += " (D)";
+            label +=
+                " (D)";
         }
 
         if (
-            i === game.smallBlindPosition
+            i ===
+            game.smallBlindPosition
         ) {
-            label += " (SB)";
+            label +=
+                " (SB)";
         }
 
         if (
-            i === game.bigBlindPosition
+            i ===
+            game.bigBlindPosition
         ) {
-            label += " (BB)";
+            label +=
+                " (BB)";
         }
 
         name.textContent =
@@ -92,7 +128,11 @@ function render() {
         hand.className =
             "cards";
 
-        if (player.isBot) {
+        if (
+            player.isBot &&
+            game.street !==
+                "showdown"
+        ) {
 
             hand.appendChild(
                 createBackCard()
@@ -123,13 +163,14 @@ function render() {
 
     }
 
-    pot.innerHTML = `
-        <div>
-            POT: $${game.pot}<br>
-            STREET:
-            ${game.street.toUpperCase()}
-        </div>
-    `;
+}
+
+function renderBoard() {
+
+    const board =
+        document.getElementById(
+            "community-cards"
+        );
 
     board.innerHTML = "";
 
@@ -162,17 +203,32 @@ function render() {
 
     }
 
-    chipTray.innerHTML = "";
+}
 
-    createActionButtons(
-        chipTray
-    );
+function renderPot() {
+
+    const pot =
+        document.getElementById(
+            "pot"
+        );
+
+    pot.innerHTML = `
+        <div>
+            Pot: $${game.pot}<br>
+            ${game.street.toUpperCase()}
+        </div>
+    `;
 
 }
 
-function createActionButtons(
-    container
-) {
+function renderActions() {
+
+    const chipTray =
+        document.getElementById(
+            "chip-tray"
+        );
+
+    chipTray.innerHTML = "";
 
     const fold =
         document.createElement(
@@ -201,9 +257,15 @@ function createActionButtons(
     fold.onclick =
         () => {
 
+            game.players[0]
+                .folded =
+                true;
+
             log(
-                "You folded."
+                "You fold."
             );
+
+            aiRound();
 
             nextStreet();
 
@@ -212,14 +274,15 @@ function createActionButtons(
     call.onclick =
         () => {
 
-            game.players[0].chips -=
+            game.players[0]
+                .chips -=
                 game.currentBet;
 
             game.pot +=
                 game.currentBet;
 
             log(
-                `You called $${game.currentBet}`
+                `You call $${game.currentBet}`
             );
 
             aiRound();
@@ -231,17 +294,17 @@ function createActionButtons(
     raise.onclick =
         () => {
 
-            game.currentBet +=
-                10;
+            game.currentBet += 10;
 
-            game.players[0].chips -=
+            game.players[0]
+                .chips -=
                 game.currentBet;
 
             game.pot +=
                 game.currentBet;
 
             log(
-                `You raised to $${game.currentBet}`
+                `You raise to $${game.currentBet}`
             );
 
             aiRound();
@@ -250,15 +313,15 @@ function createActionButtons(
 
         };
 
-    container.appendChild(
+    chipTray.appendChild(
         fold
     );
 
-    container.appendChild(
+    chipTray.appendChild(
         call
     );
 
-    container.appendChild(
+    chipTray.appendChild(
         raise
     );
 
@@ -268,7 +331,8 @@ function aiRound() {
 
     for (
         let i = 1;
-        i < game.players.length;
+        i <
+        game.players.length;
         i++
     ) {
 
@@ -343,25 +407,43 @@ function nextStreet() {
         "showdown"
     ) {
 
-        log(
-            "Showdown."
-        );
-
         render();
+
+        if (
+            game.lastWinner
+        ) {
+
+            log("");
+
+            log(
+                `${game.lastWinner.name} wins!`
+            );
+
+            log(
+                `Hand: ${
+                    game.lastWinner
+                        .handResult
+                        .name
+                }`
+            );
+
+            log(
+                "Pot awarded."
+            );
+
+        }
 
         setTimeout(
             () => {
 
-                log(
-                    "New hand."
-                );
-
                 game.nextHand();
+
+                announceNewHand();
 
                 render();
 
             },
-            3000
+            4000
         );
 
         return;
@@ -374,4 +456,4 @@ function nextStreet() {
 
 render();
 
-log("Game started.");
+log("Game ready.");

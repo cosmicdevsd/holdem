@@ -4,70 +4,57 @@ import {
     createBackCard
 } from "./ui.js";
 
-import { log } from "./logger.js";
+import { ChipManager }
+    from "./chips.js";
 
-const game = new PokerGame();
+import {
+    log,
+    handBanner
+} from "./logger.js";
+
+const game =
+    new PokerGame();
+
+const chips =
+    new ChipManager();
+
+let handNumber = 1;
 
 game.startHand();
 
-announceNewHand();
+handBanner(handNumber);
 
-function announceNewHand() {
-
-    log("");
-    log("===== NEW HAND =====");
-
-    log(
-        `Dealer: ${
-            game.getDealer().name
-        }`
-    );
-
-    log(
-        `Small Blind: ${
-            game.getSmallBlindPlayer().name
-        } ($5)`
-    );
-
-    log(
-        `Big Blind: ${
-            game.getBigBlindPlayer().name
-        } ($10)`
-    );
-
-}
+render();
 
 function render() {
 
     renderPlayers();
-
     renderBoard();
-
     renderPot();
-
-    renderActions();
+    renderBettingArea();
 
 }
 
 function renderPlayers() {
 
-    const playerSeat =
-        document.getElementById("player-seat");
-
-    const leftSeat =
-        document.getElementById("left-seat");
-
-    const topSeat =
-        document.getElementById("top-seat");
-
-    const rightSeat =
-        document.getElementById("right-seat");
-
     const seats = [
-        playerSeat,
-        leftSeat,
-        topSeat,
-        rightSeat
+
+        document.getElementById(
+            "player-seat"
+        ),
+
+        document.getElementById(
+            "left-seat"
+        ),
+
+        document.getElementById(
+            "top-seat"
+        ),
+
+        document.getElementById(
+            "right-seat"
+        )
+
     ];
 
     for (
@@ -76,54 +63,34 @@ function renderPlayers() {
         i++
     ) {
 
-        const player =
-            game.players[i];
-
         const seat =
             seats[i];
 
+        const player =
+            game.players[i];
+
         seat.innerHTML = "";
 
-        const name =
-            document.createElement("div");
+        const title =
+            document.createElement(
+                "div"
+            );
 
-        name.className =
+        title.className =
             "player-name";
 
-        let label =
-            player.name;
+        title.textContent =
+            `${player.name}
+            ($${player.chips})`;
 
-        if (
-            i ===
-            game.dealerPosition
-        ) {
-            label +=
-                " (D)";
-        }
-
-        if (
-            i ===
-            game.smallBlindPosition
-        ) {
-            label +=
-                " (SB)";
-        }
-
-        if (
-            i ===
-            game.bigBlindPosition
-        ) {
-            label +=
-                " (BB)";
-        }
-
-        name.textContent =
-            `${label} - $${player.chips}`;
-
-        seat.appendChild(name);
+        seat.appendChild(
+            title
+        );
 
         const hand =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
         hand.className =
             "cards";
@@ -131,7 +98,7 @@ function renderPlayers() {
         if (
             player.isBot &&
             game.street !==
-                "showdown"
+            "showdown"
         ) {
 
             hand.appendChild(
@@ -142,7 +109,9 @@ function renderPlayers() {
                 createBackCard()
             );
 
-        } else {
+        }
+
+        else {
 
             for (
                 const card
@@ -174,27 +143,21 @@ function renderBoard() {
 
     board.innerHTML = "";
 
-    const visible =
+    const cards =
         game.getVisibleCommunityCards();
 
-    for (
-        let i = 0;
-        i < visible.length;
-        i++
-    ) {
+    cards.forEach(
+        card => {
 
-        board.appendChild(
-            createCard(
-                visible[i]
-            )
-        );
+            board.appendChild(
+                createCard(card)
+            );
 
-    }
+        }
+    );
 
-    for (
-        let i = visible.length;
-        i < 5;
-        i++
+    while (
+        board.children.length < 5
     ) {
 
         board.appendChild(
@@ -213,26 +176,37 @@ function renderPot() {
         );
 
     pot.innerHTML = `
+
         <div>
-            Pot: $${game.pot}<br>
-            ${game.street.toUpperCase()}
+
+            Pot:
+            $${game.pot}
+
+            <br>
+
+            ${
+                game.street
+                .toUpperCase()
+            }
+
         </div>
+
     `;
 
 }
 
-function renderActions() {
+function renderBettingArea() {
 
-    const chipTray =
+    const tray =
         document.getElementById(
             "chip-tray"
         );
 
-    chipTray.innerHTML = "";
+    tray.innerHTML = "";
 
-    const fold =
+    const buttonRow =
         document.createElement(
-            "button"
+            "div"
         );
 
     const call =
@@ -245,8 +219,15 @@ function renderActions() {
             "button"
         );
 
-    fold.textContent =
-        "Fold";
+    const fold =
+        document.createElement(
+            "button"
+        );
+
+    const confirm =
+        document.createElement(
+            "button"
+        );
 
     call.textContent =
         "Call";
@@ -254,85 +235,195 @@ function renderActions() {
     raise.textContent =
         "Raise";
 
-    fold.onclick =
-        () => {
+    fold.textContent =
+        "Fold";
 
-            game.players[0]
-                .folded =
-                true;
-
-            log(
-                "You fold."
-            );
-
-            aiRound();
-
-            nextStreet();
-
-        };
+    confirm.textContent =
+        "Confirm";
 
     call.onclick =
         () => {
 
-            game.players[0]
-                .chips -=
-                game.currentBet;
-
-            game.pot +=
-                game.currentBet;
-
-            log(
-                `You call $${game.currentBet}`
+            chips.startCall(
+                game.currentBet
             );
 
-            aiRound();
-
-            nextStreet();
+            render();
 
         };
 
     raise.onclick =
         () => {
 
-            game.currentBet += 10;
+            chips.startRaise();
 
-            game.players[0]
-                .chips -=
-                game.currentBet;
-
-            game.pot +=
-                game.currentBet;
-
-            log(
-                `You raise to $${game.currentBet}`
-            );
-
-            aiRound();
-
-            nextStreet();
+            render();
 
         };
 
-    chipTray.appendChild(
-        fold
-    );
+    fold.onclick =
+        () => {
 
-    chipTray.appendChild(
+            game.players[0]
+                .fold();
+
+            log(
+                "You fold."
+            );
+
+            finishRound();
+
+        };
+
+    confirm.onclick =
+        () => {
+
+            const total =
+                chips.getBetTotal();
+
+            if (
+                total <= 0
+            ) {
+
+                return;
+
+            }
+
+            const paid =
+                game.players[0]
+                .bet(total);
+
+            game.pot +=
+                paid;
+
+            log(
+                `You bet $${paid}`
+            );
+
+            chips.clearBetArea();
+
+            finishRound();
+
+        };
+
+    buttonRow.appendChild(
         call
     );
 
-    chipTray.appendChild(
+    buttonRow.appendChild(
         raise
     );
 
+    buttonRow.appendChild(
+        fold
+    );
+
+    buttonRow.appendChild(
+        confirm
+    );
+
+    tray.appendChild(
+        buttonRow
+    );
+
+    const stacks =
+        document.createElement(
+            "div"
+        );
+
+    stacks.style.display =
+        "flex";
+
+    stacks.style.gap =
+        "10px";
+
+    stacks.style.justifyContent =
+        "center";
+
+    for (
+        const value
+        of chips.values
+    ) {
+
+        const stack =
+            document.createElement(
+                "button"
+            );
+
+        stack.textContent =
+            `$${value}
+            x${chips.stacks[value]}`;
+
+        stack.onclick =
+            () => {
+
+                if (
+                    chips.addChip(
+                        value
+                    )
+                ) {
+
+                    render();
+
+                }
+
+            };
+
+        stacks.appendChild(
+            stack
+        );
+
+    }
+
+    tray.appendChild(
+        stacks
+    );
+
+    const betArea =
+        document.createElement(
+            "div"
+        );
+
+    betArea.style.marginTop =
+        "10px";
+
+    betArea.textContent =
+        `Bet:
+        $${chips.getBetTotal()}`;
+
+    tray.appendChild(
+        betArea );
+
 }
 
-function aiRound() {
+function finishRound() {
+
+    runAi();
+
+    game.advanceStreet();
+
+    if (
+        game.street ===
+        "showdown"
+    ) {
+
+        render();
+
+        showWinner();
+
+        return;
+
+    }
+
+    render();
+
+}
+
+function runAi() {
 
     for (
         let i = 1;
-        i <
-        game.players.length;
+        i < game.players.length;
         i++
     ) {
 
@@ -349,47 +440,32 @@ function aiRound() {
             game.aiDecision();
 
         if (
-            action === "fold"
+            action ===
+            "fold"
         ) {
 
-            player.folded =
-                true;
+            player.fold();
 
             log(
-                `${player.name} folds`
-            );
-
-        }
-
-        else if (
-            action === "call"
-        ) {
-
-            player.chips -=
-                game.currentBet;
-
-            game.pot +=
-                game.currentBet;
-
-            log(
-                `${player.name} calls`
+                `${player.name}
+                folds`
             );
 
         }
 
         else {
 
-            game.currentBet +=
-                10;
-
-            player.chips -=
-                game.currentBet;
+            const paid =
+                player.bet(
+                    game.currentBet
+                );
 
             game.pot +=
-                game.currentBet;
+                paid;
 
             log(
-                `${player.name} raises`
+                `${player.name}
+                ${action}s`
             );
 
         }
@@ -398,62 +474,43 @@ function aiRound() {
 
 }
 
-function nextStreet() {
+function showWinner() {
 
-    game.advanceStreet();
+    const winner =
+        game.lastWinner;
 
-    if (
-        game.street ===
-        "showdown"
-    ) {
-
-        render();
-
-        if (
-            game.lastWinner
-        ) {
-
-            log("");
-
-            log(
-                `${game.lastWinner.name} wins!`
-            );
-
-            log(
-                `Hand: ${
-                    game.lastWinner
-                        .handResult
-                        .name
-                }`
-            );
-
-            log(
-                "Pot awarded."
-            );
-
-        }
-
-        setTimeout(
-            () => {
-
-                game.nextHand();
-
-                announceNewHand();
-
-                render();
-
-            },
-            4000
-        );
-
+    if (!winner) {
         return;
-
     }
 
-    render();
+    log(
+        `${winner.name}
+        wins the hand`
+    );
+
+    log(
+        `${winner.name}
+        shows
+        ${winner.handResult.name}`
+    );
+
+    setTimeout(
+        () => {
+
+            handNumber++;
+
+            game.nextHand();
+
+            handBanner(
+                handNumber
+            );
+
+            render();
+
+        },
+
+        4000
+
+    );
 
 }
-
-render();
-
-log("Game ready.");

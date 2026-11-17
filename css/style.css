@@ -1,205 +1,12 @@
-body {
-
-    background: #0a5d27;
-    color: white;
-
-    font-family: Arial, sans-serif;
-
-    margin: 0;
-
-    overflow-x: hidden;
-}
-
-h1 {
-
-    margin: 10px 0;
-
-    text-align: center;
-}
-
-#table {
-
-    width: 95vw;
-
-    max-width: 1800px;
-
-    min-height: 75vh;
-
-    margin: 10px auto;
-
-    padding: 2vw;
-
-    box-sizing: border-box;
-
-    background: #117236;
-
-    border: 1vw solid #4f2f18;
-
-    border-radius: 50vw;
-}
-
-#middle-row {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-}
-
-#top-seat,
-#left-seat,
-#right-seat,
-#player-seat {
-
-    min-width: 15vw;
-
-    min-height: 15vh;
-
-    text-align: center;
-}
-
-#board-area {
-
-    width: 45vw;
-
-    text-align: center;
-}
-
-#pot {
-
-    width: 20vw;
-
-    min-width: 250px;
-
-    height: 80px;
-
-    margin: 0 auto 20px auto;
-
-    border: 3px solid gold;
-
-    border-radius: 12px;
-
-    background: rgba(0,0,0,0.25);
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    font-weight: bold;
-
-    font-size: clamp(
-        18px,
-        1.3vw,
-        28px
-    );
-}
-
-#community-cards {
-
-    display: flex;
-
-    justify-content: center;
-
-    gap: 0.5vw;
-
-    min-height: 160px;
-
-    margin-bottom: 20px;
-}
-
-.cards {
-
-    display: flex;
-
-    justify-content: center;
-
-    gap: 0.5vw;
-}
-
-.card {
-
-    width: clamp(
-        50px,
-        5vw,
-        100px
-    );
-
-    height: clamp(
-        70px,
-        7vw,
-        140px
-    );
-
-    border-radius: 10px;
-
-    background: white;
-
-    color: black;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    font-size: clamp(
-        14px,
-        1.3vw,
-        30px
-    );
-
-    font-weight: bold;
-}
-
-.player-name {
-
-    margin-bottom: 10px;
-
-    font-size: clamp(
-        12px,
-        1vw,
-        20px
-    );
-}
-
-#chip-tray {
-
-    display: flex;
-
-    justify-content: center;
-
-    gap: 1vw;
-
-    flex-wrap: wrap;
-}
-
-.chip-stack {
-
-    text-align: center;
-}
-
 .chip {
 
-    width: clamp(
-        40px,
-        4vw,
-        60px
-    );
+    width: 60px;
 
-    height: clamp(
-        40px,
-        4vw,
-        60px
-    );
+    height: 60px;
 
     border-radius: 50%;
 
-    border: 3px solid white;
-
-    background: #cc3333;
+    border: 4px solid white;
 
     display: flex;
 
@@ -207,64 +14,91 @@ h1 {
 
     align-items: center;
 
-    cursor: pointer;
-
     font-weight: bold;
+
+    cursor: grab;
+
+    user-select: none;
+
+    transition:
+        transform 0.15s;
 }
 
-button {
+.chip:hover {
 
-    margin: 5px;
+    transform:
+        scale(1.1);
 
-    padding: 10px 20px;
-
-    font-size: clamp(
-        12px,
-        1vw,
-        18px
-    );
 }
 
-#log {
+.chip:active {
 
-    width: 95vw;
+    cursor: grabbing;
 
-    max-width: 1800px;
+}
 
-    height: 180px;
+.chip-5 {
 
-    margin: 10px auto;
+    background: #d73333;
 
-    background: #111;
+}
 
-    border: 2px solid #555;
+.chip-10 {
 
-    overflow-y: auto;
+    background: #3366dd;
+
+}
+
+.chip-20 {
+
+    background: #22aa44;
+
+}
+
+.chip-50 {
+
+    background: #8844cc;
+
+}
+
+.chip-100 {
+
+    background: #222;
+
+}
+
+.flying-chip {
+
+    position: fixed;
+
+    width: 40px;
+
+    height: 40px;
+
+    border-radius: 50%;
+
+    background: orange;
+
+    border: 3px solid white;
+
+    z-index: 10000;
+
+    pointer-events: none;
+
+    transition:
+        left 0.5s linear,
+        top 0.5s linear;
+}
+
+.drop-zone {
+
+    border: 3px dashed gold;
+
+    min-height: 75px;
 
     padding: 10px;
 
-    box-sizing: border-box;
+    margin-top: 10px;
 
-    font-family: monospace;
-}
-
-@media (max-width: 900px) {
-
-    #middle-row {
-
-        flex-direction: column;
-
-        gap: 20px;
-    }
-
-    #board-area {
-
-        width: 90%;
-    }
-
-    #table {
-
-        border-radius: 50px;
-    }
-
+    border-radius: 10px;
 }

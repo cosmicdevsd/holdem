@@ -24,9 +24,11 @@ export class PokerGame {
 
         this.street = "preflop";
 
-        this.currentBet = this.bigBlind;
+        this.currentBet =
+            this.bigBlind;
 
-        this.lastWinner = null;
+        this.lastWinner =
+            null;
 
         this.dealerPosition =
             Math.floor(
@@ -61,33 +63,40 @@ export class PokerGame {
 
         this.pot = 0;
 
-        this.currentBet =
-            this.bigBlind;
-
         this.street =
             "preflop";
 
+        this.currentBet =
+            this.bigBlind;
+
         this.communityCards = [];
 
-        this.lastWinner = null;
+        this.lastWinner =
+            null;
 
         this.deck.build();
 
         this.deck.shuffle();
 
-        for (const player of this.players) {
+        for (
+            const player
+            of this.players
+        ) {
 
-            player.hand = [];
-
-            player.folded = false;
-
-            player.handResult = null;
+            player.resetForHand();
 
         }
 
-        for (let i = 0; i < 2; i++) {
+        for (
+            let i = 0;
+            i < 2;
+            i++
+        ) {
 
-            for (const player of this.players) {
+            for (
+                const player
+                of this.players
+            ) {
 
                 player.hand.push(
                     this.deck.deal()
@@ -97,7 +106,11 @@ export class PokerGame {
 
         }
 
-        for (let i = 0; i < 5; i++) {
+        for (
+            let i = 0;
+            i < 5;
+            i++
+        ) {
 
             this.communityCards.push(
                 this.deck.deal()
@@ -121,38 +134,55 @@ export class PokerGame {
                 this.bigBlindPosition
             ];
 
-        sb.chips -=
-            this.smallBlind;
-
-        bb.chips -=
-            this.bigBlind;
+        this.pot +=
+            sb.bet(
+                this.smallBlind
+            );
 
         this.pot +=
-            this.smallBlind +
-            this.bigBlind;
+            bb.bet(
+                this.bigBlind
+            );
+
+        sb.lastAction =
+            "Small Blind";
+
+        bb.lastAction =
+            "Big Blind";
 
     }
 
     getVisibleCommunityCards() {
 
-        switch (this.street) {
+        switch (
+            this.street
+        ) {
 
             case "preflop":
+
                 return [];
 
             case "flop":
-                return this.communityCards.slice(0, 3);
+
+                return this.communityCards
+                    .slice(0, 3);
 
             case "turn":
-                return this.communityCards.slice(0, 4);
+
+                return this.communityCards
+                    .slice(0, 4);
 
             case "river":
-                return this.communityCards.slice(0, 5);
+
+                return this.communityCards
+                    .slice(0, 5);
 
             case "showdown":
+
                 return this.communityCards;
 
             default:
+
                 return [];
 
         }
@@ -161,18 +191,29 @@ export class PokerGame {
 
     advanceStreet() {
 
-        switch (this.street) {
+        switch (
+            this.street
+        ) {
 
             case "preflop":
-                this.street = "flop";
+
+                this.street =
+                    "flop";
+
                 return;
 
             case "flop":
-                this.street = "turn";
+
+                this.street =
+                    "turn";
+
                 return;
 
             case "turn":
-                this.street = "river";
+
+                this.street =
+                    "river";
+
                 return;
 
             case "river":
@@ -196,35 +237,15 @@ export class PokerGame {
                 this.communityCards
             );
 
+        if (!winner) {
+            return;
+        }
+
         winner.chips +=
             this.pot;
 
         this.lastWinner =
             winner;
-
-        this.pot = 0;
-
-    }
-
-    aiDecision() {
-
-        const random =
-            new Uint32Array(1);
-
-        crypto.getRandomValues(
-            random
-        );
-
-        const roll =
-            random[0] % 100;
-
-        if (roll < 20)
-            return "fold";
-
-        if (roll < 80)
-            return "call";
-
-        return "raise";
 
     }
 

@@ -1,4 +1,4 @@
-function suitSymbol(suit) {
+function getSuitSymbol(suit) {
 
     switch (suit) {
 
@@ -16,6 +16,7 @@ function suitSymbol(suit) {
 
         default:
             return "?";
+
     }
 
 }
@@ -25,19 +26,39 @@ export function createCard(card) {
     const div =
         document.createElement("div");
 
-    div.className = "card";
-
-    const red =
-        card.suit === "H" ||
-        card.suit === "D";
-
-    div.classList.add(
-        red ? "red" : "black"
-    );
+    div.className =
+        "card";
 
     div.textContent =
         card.rank +
-        suitSymbol(card.suit);
+        getSuitSymbol(card.suit);
+
+    if (
+        card.suit === "H" ||
+        card.suit === "D"
+    ) {
+        div.style.color = "red";
+    }
+
+    return div;
+}
+
+export function createBackCard() {
+
+    const div =
+        document.createElement("div");
+
+    div.className =
+        "card";
+
+    div.style.background =
+        "#223";
+
+    div.style.color =
+        "white";
+
+    div.textContent =
+        "🂠";
 
     return div;
 }

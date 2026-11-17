@@ -1,5 +1,6 @@
 import { Deck } from "./deck.js";
 import { Player } from "./player.js";
+import { determineWinner } from "./evaluator.js";
 
 export class PokerGame {
 
@@ -24,6 +25,8 @@ export class PokerGame {
         this.street = "preflop";
 
         this.currentBet = this.bigBlind;
+
+        this.lastWinner = null;
 
         this.dealerPosition =
             Math.floor(
@@ -58,11 +61,18 @@ export class PokerGame {
 
         this.pot = 0;
 
-        this.street = "preflop";
+        this.currentBet =
+            this.bigBlind;
+
+        this.street =
+            "preflop";
 
         this.communityCards = [];
 
+        this.lastWinner = null;
+
         this.deck.build();
+
         this.deck.shuffle();
 
         for (const player of this.players) {
@@ -70,6 +80,8 @@ export class PokerGame {
             player.hand = [];
 
             player.folded = false;
+
+            player.handResult = null;
 
         }
 
@@ -116,9 +128,7 @@ export class PokerGame {
             this.bigBlind;
 
         this.pot +=
-            this.smallBlind;
-
-        this.pot +=
+            this.smallBlind +
             this.bigBlind;
 
     }
@@ -131,22 +141,13 @@ export class PokerGame {
                 return [];
 
             case "flop":
-                return this.communityCards.slice(
-                    0,
-                    3
-                );
+                return this.communityCards.slice(0, 3);
 
             case "turn":
-                return this.communityCards.slice(
-                    0,
-                    4
-                );
+                return this.communityCards.slice(0, 4);
 
             case "river":
-                return this.communityCards.slice(
-                    0,
-                    5
-                );
+                return this.communityCards.slice(0, 5);
 
             case "showdown":
                 return this.communityCards;
@@ -163,24 +164,15 @@ export class PokerGame {
         switch (this.street) {
 
             case "preflop":
-
-                this.street =
-                    "flop";
-
+                this.street = "flop";
                 return;
 
             case "flop":
-
-                this.street =
-                    "turn";
-
+                this.street = "turn";
                 return;
 
             case "turn":
-
-                this.street =
-                    "river";
-
+                this.street = "river";
                 return;
 
             case "river":
@@ -188,21 +180,48 @@ export class PokerGame {
                 this.street =
                     "showdown";
 
+                this.awardPot();
+
                 return;
 
         }
 
     }
 
+    awardPot() {
+
+        const winner =
+            determineWinner(
+                this.players,
+                this.communityCards
+            );
+
+        winner.chips +=
+            this.pot;
+
+        this.lastWinner =
+            winner;
+
+        this.pot = 0;
+
+    }
+
     aiDecision() {
 
-        const roll =
-            Math.random();
+        const random =
+            new Uint32Array(1);
 
-        if (roll < 0.2)
+        crypto.getRandomValues(
+            random
+        );
+
+        const roll =
+            random[0] % 100;
+
+        if (roll < 20)
             return "fold";
 
-        if (roll < 0.8)
+        if (roll < 80)
             return "call";
 
         return "raise";

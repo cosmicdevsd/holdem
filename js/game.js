@@ -16,22 +16,29 @@ export class PokerGame {
 
         this.communityCards = [];
 
+        this.dealerPosition = 0;
+
         this.pot = 0;
 
-        this.dealerPosition = 0;
+        this.chips = {
+            5: 20,
+            10: 20,
+            20: 20,
+            50: 20,
+            100: 20
+        };
     }
 
     startHand() {
 
         this.deck.build();
-
         this.deck.shuffle();
 
         this.communityCards = [];
 
-        this.players.forEach(
-            p => p.hand = []
-        );
+        for (const player of this.players) {
+            player.hand = [];
+        }
 
         for (let i = 0; i < 2; i++) {
 

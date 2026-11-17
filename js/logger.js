@@ -1,14 +1,65 @@
+const MAX_LOG_LINES = 250;
+
 export function log(message) {
 
-    console.log(message);
+    console.log(
+        `[Poker] ${message}`
+    );
 
     const logBox =
-        document.getElementById("log");
+        document.getElementById(
+            "log"
+        );
 
-    const div =
-        document.createElement("div");
+    if (!logBox) {
+        return;
+    }
 
-    div.textContent = message;
+    const line =
+        document.createElement(
+            "div"
+        );
 
-    logBox.prepend(div);
+    const now =
+        new Date();
+
+    const timestamp =
+        now.toLocaleTimeString();
+
+    line.textContent =
+        `[${timestamp}] ${message}`;
+
+    logBox.prepend(line);
+
+    while (
+        logBox.children.length >
+        MAX_LOG_LINES
+    ) {
+
+        logBox.removeChild(
+            logBox.lastChild
+        );
+
+    }
+
+}
+
+export function separator() {
+
+    log(
+        "------------------------------------------"
+    );
+
+}
+
+export function handBanner(number) {
+
+    separator();
+
+    log(
+        `HAND ${number}`
+    );
+
+    separator();
+
 }

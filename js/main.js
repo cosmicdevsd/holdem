@@ -78,33 +78,21 @@ function renderPlayers() {
         let badges = "";
 
         if (
-            i ===
-            game.dealerPosition
+            i === game.dealerPosition
         ) {
-
-            badges +=
-                " [D]";
-
+            badges += " [D]";
         }
 
         if (
-            i ===
-            game.smallBlindPosition
+            i === game.smallBlindPosition
         ) {
-
-            badges +=
-                " [SB]";
-
+            badges += " [SB]";
         }
 
         if (
-            i ===
-            game.bigBlindPosition
+            i === game.bigBlindPosition
         ) {
-
-            badges +=
-                " [BB]";
-
+            badges += " [BB]";
         }
 
         const title =
@@ -141,7 +129,7 @@ function renderPlayers() {
         if (
             player.isBot &&
             game.street !==
-            "showdown"
+                "showdown"
         ) {
 
             hand.appendChild(
@@ -186,10 +174,10 @@ function renderBoard() {
 
     board.innerHTML = "";
 
-    const visibleCards =
+    const visible =
         game.getVisibleCommunityCards();
 
-    visibleCards.forEach(
+    visible.forEach(
         card => {
 
             board.appendChild(
@@ -218,38 +206,11 @@ function renderPot() {
             "pot"
         );
 
-    let extra = "";
-
-    if (
-        game.lastWinner
-    ) {
-
-        extra =
-        `
-        <br>
-        Winner:
-        ${game.lastWinner.name}
-        <br>
-        ${
-            game.lastWinner
-                .handResult
-                ?.name || ""
-        }
-        `;
-    }
-
     pot.innerHTML = `
         <div>
-
-            Pot:
-            $${game.pot}
-
+            Pot: $${game.pot}
             <br>
-
             ${game.street.toUpperCase()}
-
-            ${extra}
-
         </div>
     `;
 
@@ -344,9 +305,7 @@ function renderBettingArea() {
             if (
                 total <= 0
             ) {
-
                 return;
-
             }
 
             const paid =
@@ -398,30 +357,46 @@ function renderBettingArea() {
     stackRow.style.display =
         "flex";
 
-    stackRow.style.gap =
-        "10px";
-
     stackRow.style.justifyContent =
         "center";
 
+    stackRow.style.gap =
+        "20px";
+
     stackRow.style.marginTop =
-        "10px";
+        "15px";
 
     for (
         const value
         of chips.values
     ) {
 
-        const button =
+        const stack =
             document.createElement(
-                "button"
+                "div"
             );
 
-        button.textContent =
-            `$${value}
-             x${chips.stacks[value]}`;
+        stack.style.display =
+            "flex";
 
-        button.onclick =
+        stack.style.flexDirection =
+            "column";
+
+        stack.style.alignItems =
+            "center";
+
+        const chip =
+            document.createElement(
+                "div"
+            );
+
+        chip.className =
+            `chip chip-${value}`;
+
+        chip.textContent =
+            value;
+
+        chip.onclick =
             () => {
 
                 if (
@@ -436,8 +411,27 @@ function renderBettingArea() {
 
             };
 
+        const count =
+            document.createElement(
+                "div"
+            );
+
+        count.style.marginTop =
+            "5px";
+
+        count.textContent =
+            `x${chips.stacks[value]}`;
+
+        stack.appendChild(
+            chip
+        );
+
+        stack.appendChild(
+            count
+        );
+
         stackRow.appendChild(
-            button
+            stack
         );
 
     }
@@ -451,14 +445,14 @@ function renderBettingArea() {
             "div"
         );
 
-    betArea.style.marginTop =
-        "12px";
+    betArea.className =
+        "drop-zone";
 
-    betArea.innerHTML =
-        `
-        Current Bet:
+    betArea.innerHTML = `
+        Current Bet
+        <br>
         $${chips.getBetTotal()}
-        `;
+    `;
 
     tray.appendChild(
         betArea
@@ -513,7 +507,8 @@ function runAi() {
             );
 
         if (
-            action === "fold"
+            action ===
+            "fold"
         ) {
 
             player.fold();
@@ -525,7 +520,8 @@ function runAi() {
         }
 
         else if (
-            action === "call"
+            action ===
+            "call"
         ) {
 
             const paid =
@@ -581,12 +577,8 @@ function showWinner() {
     const winner =
         game.lastWinner;
 
-    if (
-        !winner
-    ) {
-
+    if (!winner) {
         return;
-
     }
 
     log(

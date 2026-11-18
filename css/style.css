@@ -1,3 +1,192 @@
+body {
+
+    margin: 0;
+
+    background: #0a5d27;
+
+    color: white;
+
+    font-family: Arial, sans-serif;
+
+    overflow-x: hidden;
+
+}
+
+h1 {
+
+    text-align: center;
+
+    margin: 10px 0;
+
+}
+
+#table {
+
+    width: 95vw;
+
+    min-height: 75vh;
+
+    margin: 10px auto;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+    background: #117236;
+
+    border: 15px solid #4f2f18;
+
+    border-radius: 300px;
+
+}
+
+#middle-row {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+}
+
+#top-seat,
+#left-seat,
+#right-seat,
+#player-seat {
+
+    min-width: 180px;
+
+    min-height: 180px;
+
+    text-align: center;
+
+}
+
+#board-area {
+
+    width: 700px;
+
+    text-align: center;
+
+}
+
+.player-name {
+
+    margin-bottom: 10px;
+
+    font-size: 16px;
+
+}
+
+.cards {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 10px;
+
+}
+
+.card {
+
+    width: 90px;
+
+    height: 130px;
+
+    border-radius: 12px;
+
+    background: white;
+
+    color: black;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    font-size: 28px;
+
+    font-weight: bold;
+
+    border: 2px solid black;
+
+}
+
+#community-cards {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    min-height: 150px;
+
+    margin-bottom: 20px;
+
+}
+
+#pot {
+
+    width: 260px;
+
+    min-height: 90px;
+
+    margin: 0 auto 20px auto;
+
+    border: 3px solid gold;
+
+    border-radius: 12px;
+
+    background: rgba(0, 0, 0, 0.3);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+}
+
+#chip-tray {
+
+    margin-top: 15px;
+
+}
+
+#log {
+
+    width: 95vw;
+
+    max-width: 1400px;
+
+    height: 220px;
+
+    margin: 15px auto;
+
+    background: #111;
+
+    border: 2px solid #555;
+
+    overflow-y: auto;
+
+    padding: 10px;
+
+    box-sizing: border-box;
+
+    font-family: monospace;
+
+}
+
+/* ---------- CHIP STYLING ---------- */
+
 .chip {
 
     width: 60px;
@@ -20,14 +209,13 @@
 
     user-select: none;
 
-    transition:
-        transform 0.15s;
+    transition: transform 0.15s;
+
 }
 
 .chip:hover {
 
-    transform:
-        scale(1.1);
+    transform: scale(1.1);
 
 }
 
@@ -67,6 +255,8 @@
 
 }
 
+/* ---------- ANIMATION ---------- */
+
 .flying-chip {
 
     position: fixed;
@@ -88,7 +278,10 @@
     transition:
         left 0.5s linear,
         top 0.5s linear;
+
 }
+
+/* ---------- DROP AREA ---------- */
 
 .drop-zone {
 
@@ -101,4 +294,15 @@
     margin-top: 10px;
 
     border-radius: 10px;
+
+}
+
+button {
+
+    padding: 8px 16px;
+
+    margin: 4px;
+
+    cursor: pointer;
+
 }
